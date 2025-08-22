@@ -3,6 +3,7 @@ const bcrypt = require('bcryptjs');
 const User = require('../models/user');
 const nodemailer = require('nodemailer');
 const { validationResult } = require('express-validator');
+const { ValidationError } = require('sequelize');
 
 const transporter = nodemailer.createTransport({
   host: 'in-v3.mailjet.com',
@@ -43,6 +44,7 @@ exports.getSignup = (req, res, next) => {
       password: '',
       confirmPassword: '',
     },
+    validationErrors:[]
   });
 };
 
@@ -85,6 +87,7 @@ exports.postSignup = (req, res, next) => {
       pageTitle: 'Signup',
       errorMessage:errors.array()[0].msg,
       oldInput: { email: email, password: password, confirmPassword: req.body.confirmPassword, },
+      validationErrors: errors.array(),
     });
   }
     return bcrypt.hash(password,12).then(hashedPassword=>{
