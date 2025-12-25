@@ -33,6 +33,15 @@ const store = new MongoDBStore({
   collection: "sessions",
 });
 
+const csrfProtection = csrf();
+const fileStorage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, "images");
+  },
+  filename: function (req, file, cb) {
+    cb(null, new Date().toISOString() + "-" + file.originalname);
+  },
+});
 /* ===============================
    View engine
    =============================== */
@@ -50,11 +59,7 @@ const authRoutes = require("./routes/auth");
    Middleware
    =============================== */
 app.use(bodyParser.urlencoded({ extended: false }));
-app.use(
-  multer({
-    dest: "images",
-  }).single("image")
-);
+app.use(multer({ storage: fileStorage }).single("image"));
 app.use(express.static(path.join(__dirname, "public")));
 
 app.use(
@@ -66,7 +71,6 @@ app.use(
   })
 );
 
-const csrfProtection = csrf();
 app.use(csrfProtection);
 app.use(flash());
 
