@@ -9,3 +9,11 @@ docker build -t nodejs-complete-guide .
 docker compose up
 docker compose down
 ```
+
+## Logging
+
+```bash
+docker logs -f nodejs-dev
+```
+
+you can change `nodejs-dev` to any other container name
