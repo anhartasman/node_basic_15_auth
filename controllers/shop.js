@@ -1,3 +1,5 @@
+const fs = require("fs");
+const path = require("path");
 const Product = require("../models/product");
 const Order = require("../models/order");
 
@@ -145,4 +147,29 @@ exports.getOrders = (req, res, next) => {
       error.httpStatusCode = 500;
       return next(error);
     });
+};
+
+exports.getInvoice = (req, res, next) => {
+  // Implementation for downloading invoice PDF
+  const orderId = req.params.orderId;
+  const invoiceName = "invoice-" + orderId + ".pdf";
+  const invoicePath = path.join("data", "invoices", invoiceName);
+
+  fs.readFile(invoicePath, (err, data) => {
+    console.log(
+      "Reading invoice for order:",
+      orderId,
+      "from path:",
+      invoicePath
+    );
+    if (err) {
+      console.log("Error reading invoice:", err);
+      const error = new Error("Invoice not found");
+      error.httpStatusCode = 404;
+      return next(error);
+    }
+    res.setHeader("Content-Type", "application/pdf");
+    res.setHeader("Content-Disposition", `inline; filename="${invoiceName}"`);
+    res.send(data);
+  });
 };
